@@ -2,8 +2,10 @@ import sys
 import pygame
 
 from random import randint
+from time import sleep
 
 from settings import Settings
+from game_stats import GameStats
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -21,6 +23,7 @@ class AlienInvasion:
         self.settings.screen_size = (self.screen.get_rect().width,
                                      self.screen.get_rect().height)
         pygame.display.set_caption("Alien Invision")
+        self.stats = GameStats(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -122,8 +125,7 @@ class AlienInvasion:
 
         # Проверка коллизий "пришелец-корабль"
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            print('SHIP HIT!!!')
-            sys.exit()
+            self._ship_hit()
 
     def _check_fleet_edges(self):
         """Реакция на достижение кораблем пришельцев края экрана"""
@@ -137,6 +139,18 @@ class AlienInvasion:
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
+
+    def _ship_hit(self):
+        """Обработка столкновений корабля с пришельцами"""
+        self.stats.ships_left -= 1
+
+        self.aliens.empty()
+        self.bullets.empty()
+
+        self._create_fleet()
+        self.ship.center_ship()
+
+        sleep(0.5)
 
     def _create_star(self, star_num, row_num):
         """Создание звезды и ее размещение"""
