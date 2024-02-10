@@ -1,9 +1,13 @@
 import sys
 import pygame
 
+from random import randint
+
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
+from stars import Stars
 
 
 class AlienInvasion:
@@ -19,6 +23,12 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invision")
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        self.stars = pygame.sprite.Group()
+
+        self._create_stars_sky()
+
+        self._create_fleet()
 
     def run_game(self):
         """Запуск основного цикла игры"""
@@ -56,7 +66,6 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
-
     def _fire_bullet(self):
         """Создание нового снаряда и включение его в группу self.bullets"""
         if len(self.bullets) < self.settings.bullets_allowed:
@@ -69,12 +78,61 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_alien(self, alien_num, row_num):
+        """Создание корабля пришельцев и его размещение"""
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+        alien.x = alien_width + 2 * alien_width * alien_num
+        alien.rect.x = alien.x
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_num
+        self.aliens.add(alien)
+
+    def _create_fleet(self):
+        """Создание флота вторжения"""
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+        available_space_x = self.settings.screen_size[0] - (2 * alien_width)
+        number_aliens_x = available_space_x // (2 * alien_width)
+        # Определение кол-ва рядов на экране
+        ship_height = self.ship.rect.height
+        available_space_y = (self.settings.screen_size[1] - (3 * alien_height) - ship_height)
+        number_rows = available_space_y // (2 * alien_height)
+
+        for row_num in range(number_rows):
+            for alien_num in range(number_aliens_x):
+                self._create_alien(alien_num, row_num)
+
+    def _create_star(self, star_num, row_num):
+        """Создание звезды и ее размещение"""
+        star = Stars(self)
+        star_width, star_height = star.rect.size
+        random_num = randint(-70, 70)
+        star.x = (star_width + 4 * star_width * star_num) + random_num
+        star.rect.x = star.x
+        star.rect.y = (star.rect.height + 4 * star.rect.height * row_num) + random_num
+        self.stars.add(star)
+
+
+    def _create_stars_sky(self):
+        """Создание звездного неба"""
+        star = Stars(self)
+        star_width, star_height = star.rect.size
+        available_space_x = self.settings.screen_size[0] - (4 * star_width)
+        number_stars_x = available_space_x // (4 * star_width)
+        # Определение кол-ва рядов на экране
+        number_rows = self.settings.screen_size[1] // (3 * star_height)
+        for row_num in range(number_rows):
+            for star_num in range(number_stars_x):
+                self._create_star(star_num, row_num)
+
     def _update_screen(self):
         """Обновляет изображение и отображает новый экран"""
         self.screen.fill(self.settings.bg_color)
+        self.stars.draw(self.screen)
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
         pygame.display.flip()
 
 

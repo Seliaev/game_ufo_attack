@@ -1,7 +1,9 @@
 import pygame
 
+
 class Ship:
     """Класс корабля игрока"""
+
     def __init__(self, game):
         """Иницилизация корабля и установка в начальную позицию"""
         self.icon_ship = "images/ship.bmp"
@@ -9,10 +11,10 @@ class Ship:
         self.settings = game.settings
         self.screen_rect = game.screen.get_rect()
 
-        #Загрузка изображения корабля
+        # Загрузка изображения корабля
         self.image = pygame.image.load(self.icon_ship)
         self.rect = self.image.get_rect()
-        # Каждый новый корабяль появляется у нижнего края экрана
+        # Каждый новый корабль появляется у нижнего края экрана
         self.rect.midbottom = self.screen_rect.midbottom
 
         self.x = float(self.rect.x)
