@@ -120,6 +120,11 @@ class AlienInvasion:
         self._check_fleet_edges()
         self.aliens.update()
 
+        # Проверка коллизий "пришелец-корабль"
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            print('SHIP HIT!!!')
+            sys.exit()
+
     def _check_fleet_edges(self):
         """Реакция на достижение кораблем пришельцев края экрана"""
         for alien in self.aliens.sprites():
