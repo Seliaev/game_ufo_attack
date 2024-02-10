@@ -36,6 +36,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
 
     def _check_events(self):
@@ -102,6 +103,24 @@ class AlienInvasion:
             for alien_num in range(number_aliens_x):
                 self._create_alien(alien_num, row_num)
 
+    def _update_aliens(self):
+        """Обновляет позиции всех пришельцев во флоте"""
+        self._check_fleet_edges()
+        self.aliens.update()
+
+    def _check_fleet_edges(self):
+        """Реакция на достижение кораблем пришельцев края экрана"""
+        for alien in self.aliens.sprites():
+            if alien.check_edge():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Опускает весь флот и меняет направление флота"""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
+
     def _create_star(self, star_num, row_num):
         """Создание звезды и ее размещение"""
         star = Stars(self)
@@ -111,7 +130,6 @@ class AlienInvasion:
         star.rect.x = star.x
         star.rect.y = (star.rect.height + 4 * star.rect.height * row_num) + random_num
         self.stars.add(star)
-
 
     def _create_stars_sky(self):
         """Создание звездного неба"""
