@@ -11,6 +11,7 @@ from bullet import Bullet
 from alien import Alien
 from stars import Stars
 from button import Button
+from scoreboard import Scoreboard
 
 
 class AlienInvasion:
@@ -25,6 +26,7 @@ class AlienInvasion:
         #                              self.screen.get_rect().height)
         pygame.display.set_caption("Alien Invision")
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -69,13 +71,14 @@ class AlienInvasion:
     def _start_game(self):
         """Запуск игры при нажатии клавиши P или кнопки Play"""
         pygame.mouse.set_visible(False)
-        self.stats.reset_stats()
-        self.settings.initialize_dynamic_settings()
         self.stats.game_active = True
         self._restart()
 
     def _restart(self):
         """Перезапуск игры"""
+        self.stats.reset_stats()
+        self.sb.prep_score()
+        self.settings.initialize_dynamic_settings()
         self.aliens.empty()
         self.bullets.empty()
         self.stars.empty()
@@ -130,6 +133,11 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.reward_point_for_hit * len(aliens)
+            self.sb.prep_score()
+            self.sb.check_high_score()
 
     def _create_alien(self, alien_num, row_num):
         """Создание корабля пришельцев и его размещение"""
@@ -225,6 +233,7 @@ class AlienInvasion:
         """Обновляет изображение и отображает новый экран"""
         self.screen.fill(self.settings.bg_color)
         self.stars.draw(self.screen)
+        self.sb.show_score()
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
