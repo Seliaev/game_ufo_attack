@@ -19,9 +19,9 @@ class AlienInvasion:
         """Инициализирует игру и создает игровые ресурсы"""
         pygame.init()
         self.settings = Settings()
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        self.settings.screen_size = (self.screen.get_rect().width,
-                                     self.screen.get_rect().height)
+        self.screen = pygame.display.set_mode(self.settings.screen_size) # pygame.FULLSCREEN
+        # self.settings.screen_size = (self.screen.get_rect().width,
+        #                              self.screen.get_rect().height)
         pygame.display.set_caption("Alien Invision")
         self.stats = GameStats(self)
         self.ship = Ship(self)
@@ -37,9 +37,11 @@ class AlienInvasion:
         """Запуск основного цикла игры"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
+
             self._update_screen()
 
     def _check_events(self):
@@ -127,6 +129,9 @@ class AlienInvasion:
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
 
+        # Проверка соприкосновения кораблей пришельцев с нижним краем экрана
+        self._check_aliens_buttom()
+
     def _check_fleet_edges(self):
         """Реакция на достижение кораблем пришельцев края экрана"""
         for alien in self.aliens.sprites():
@@ -143,14 +148,26 @@ class AlienInvasion:
     def _ship_hit(self):
         """Обработка столкновений корабля с пришельцами"""
         self.stats.ships_left -= 1
+        if self.stats.ships_left > 0:
+            self.aliens.empty()
+            self.bullets.empty()
+            self.stars.empty()
+            self._create_stars_sky()
+            self._create_fleet()
+            self.ship.center_ship()
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
 
-        self.aliens.empty()
-        self.bullets.empty()
+    def _check_aliens_buttom(self):
+        """Проверяет соприкосновение кораблей пришельцев с нижней частью экрана"""
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                # Те же действия, что при столкновении с кораблем игрока
+                self._ship_hit()
+                break
 
-        self._create_fleet()
-        self.ship.center_ship()
-
-        sleep(0.5)
 
     def _create_star(self, star_num, row_num):
         """Создание звезды и ее размещение"""
