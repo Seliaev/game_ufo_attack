@@ -7,15 +7,33 @@ class Settings:
         self.screen_size = 1200, 800
         self.bg_color = 230, 230, 230
         # Параметры корабля игрока
-        self.ship_speed_factor = 1.5
         self.ship_limit = 3
         # Параметры снаряда
-        self.bullet_speed_factor = 1.5
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = 60, 60, 60
         self.bullets_allowed = 3
         # Параметры кораблей пришельцев
-        self.alien_speed_factor = 0.4
         self.fleet_drop_speed = 10
+
+        self.speedup_scale = 1.3
+        self.initialize_dynamic_settings()
+
+    def initialize_dynamic_settings(self):
+        """Инициализация настроек, меняющиеся по ходу игры"""
+        # Параметры корабля игрока
+        self.ship_speed_factor = 1.5
+        # Параметры снаряда
+        self.bullet_speed_factor = 1.5
+        # Параметры кораблей пришельцев
+        self.alien_speed_factor = 0.4
         self.fleet_direction = 1  # 1 - движение вправо; -1 - движение влево
+
+    def increase_speed(self):
+        """Увеличение настроек скорости"""
+        self.ship_speed_factor *= self.speedup_scale
+        self.bullet_speed_factor *= self.speedup_scale
+        self.alien_speed_factor *= self.speedup_scale
+
+
+

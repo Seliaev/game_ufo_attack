@@ -3,8 +3,8 @@ import pygame.font
 
 class Button:
     """Класс для создания обьекта кнопки"""
-
-    def __init__(self, game, msg):
+    height_y_spaces = 65
+    def __init__(self, game, msg, x, y):
         """Инициализация атрибутов кнопки"""
         self.screen = game.screen
         self.screen_rect = self.screen.get_rect()
@@ -17,7 +17,7 @@ class Button:
 
         # Построение обьекта кнопки и выравнивание по центру экрана
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.rect.center = self.screen_rect.center
+        self.rect.center = x, y
 
         # Установка текста кнопки
         self._prep_msg(msg)
