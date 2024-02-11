@@ -1,11 +1,13 @@
 import pygame
+from pygame.sprite import Sprite
 
 
-class Ship:
+class Ship(Sprite):
     """Класс корабля игрока"""
 
     def __init__(self, game):
         """Иницилизация корабля и установка в начальную позицию"""
+        super().__init__()
         self.icon_ship = "images/ship.bmp"
         self.screen = game.screen
         self.settings = game.settings

@@ -77,7 +77,12 @@ class AlienInvasion:
     def _restart(self):
         """Перезапуск игры"""
         self.stats.reset_stats()
+        self._restart_window()
+
+    def _restart_window(self):
         self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ship()
         self.settings.initialize_dynamic_settings()
         self.aliens.empty()
         self.bullets.empty()
@@ -133,11 +138,15 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+            self.stats.level += 1
+            self.sb.prep_level()
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.reward_point_for_hit * len(aliens)
             self.sb.prep_score()
             self.sb.check_high_score()
+
+
 
     def _create_alien(self, alien_num, row_num):
         """Создание корабля пришельцев и его размещение"""
@@ -190,9 +199,9 @@ class AlienInvasion:
 
     def _ship_hit(self):
         """Обработка столкновений корабля с пришельцами"""
-        self.stats.ships_left -= 1
-        if self.stats.ships_left > 0:
-            self._restart()
+        if self.stats.ships_left > 1:
+            self.stats.ships_left -= 1
+            self._restart_window()
             sleep(0.5)
         else:
             self.stats.game_active = False
