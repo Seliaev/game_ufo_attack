@@ -30,7 +30,6 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
         self.stars = pygame.sprite.Group()
         self._create_stars_sky()
-        self._create_fleet()
         x_play_button, y_play_button = self.screen.get_rect().center
         y_play_button -= Button.height_y_spaces
         self.play_button = Button(self, "Play", x_play_button, y_play_button)
@@ -98,6 +97,8 @@ class AlienInvasion:
             self._start_game()
         elif event.key == pygame.K_r:
             self._restart()
+        elif event.key == pygame.K_ESCAPE:
+            self.stats.pause()
 
     def _check_events_keyup(self, event):
         """Реагирует на отпускание клавишь"""
